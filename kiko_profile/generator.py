@@ -95,17 +95,28 @@ def generate_walking_animation(
     quantized_frames: List[Image.Image] = []
     
     if is_transparent:
+        # Create a crystal-clean palette with reserved transparency index 127
         for f in composite_frames:
-            alpha = f.split()[-1]
-            p_img = f.convert("RGB").convert("P", palette=Image.Palette.ADAPTIVE, colors=128)
-            # Find transparent pixels where alpha <= 128
-            mask = Image.eval(alpha, lambda a: 255 if a <= 128 else 0)
-            p_img.paste(255, mask)
-            p_img.info["transparency"] = 255
-            quantized_frames.append(p_img)
+            arr = np.array(f)
+            mask_trans = arr[:, :, 3] <= 60
+            
+            # Extract RGB and quantize to 127 colors
+            rgb_img = Image.fromarray(arr[:, :, :3], mode="RGB")
+            p_img = rgb_img.quantize(colors=127, method=Image.Resampling.LANCZOS)
+            
+            p_arr = np.array(p_img)
+            p_arr[mask_trans] = 127
+            
+            out_p = Image.fromarray(p_arr, mode="P")
+            palette = list(p_img.getpalette())
+            # Ensure index 127 has neutral dark background color
+            palette[127 * 3 : 127 * 3 + 3] = [13, 17, 23]
+            out_p.putpalette(palette)
+            out_p.info["transparency"] = 127
+            quantized_frames.append(out_p)
     else:
         for f in composite_frames:
-            p_img = f.convert("RGB").convert("P", palette=Image.Palette.ADAPTIVE, colors=128)
+            p_img = f.convert("RGB").quantize(colors=128, method=Image.Resampling.LANCZOS)
             quantized_frames.append(p_img)
             
     return quantized_frames, hero_sprite
