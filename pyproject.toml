@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kiko-profile"
+version = "1.0.0"
+description = "Animated pixel-art snapping turtle walking across your GitHub profile README, powered by your contributions."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [
+    { name = "Richardsen Thomas", email = "richardsenthomas888@gmail.com" }
+]
+keywords = ["github-profile", "pixel-art", "snapping-turtle", "readme-widget", "github-action", "kiko"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Artistic Software",
+    "Topic :: Utilities",
+]
+dependencies = [
+    "pillow>=9.0.0",
+    "numpy>=1.20.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/rtomswastaken/kiko-profile"
+Repository = "https://github.com/rtomswastaken/kiko-profile"
+Issues = "https://github.com/rtomswastaken/kiko-profile/issues"
+
+[project.scripts]
+kiko-profile = "kiko_profile.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["kiko_profile*"]
+
+[tool.setuptools.package-data]
+kiko_profile = ["assets/*.png"]

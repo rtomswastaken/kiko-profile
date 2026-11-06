@@ -1,0 +1,55 @@
+name: 'kiko-profile'
+description: 'Draw an animated pixel-art snapping turtle walking across your GitHub profile README, powered by your contributions.'
+branding:
+  icon: 'shield'
+  color: 'green'
+
+inputs:
+  login:
+    description: 'Account whose activity to draw.'
+    default: ${{ github.repository_owner }}
+  stage:
+    description: 'Evolution stage: auto, baby, juvenile, or titan.'
+    default: 'auto'
+  background:
+    description: "Background: 'transparent', 'dark' (#0d1117), or custom hex color."
+    default: 'transparent'
+  output-dir:
+    description: 'Folder, relative to workspace, that receives kiko.gif, kiko.png, and preview.html.'
+    default: 'kiko'
+  width:
+    description: 'Canvas banner width in pixels.'
+    default: '840'
+  height:
+    description: 'Canvas banner height in pixels.'
+    default: '80'
+  token:
+    description: 'Token for reading contribution data (built-in token is sufficient).'
+    default: ${{ github.token }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      shell: bash
+      run: |
+        python3 -m pip install --upgrade pip
+        python3 -m pip install pillow numpy
+
+    - name: Generate Kiko Snapping Turtle
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.token }}
+        PYTHONPATH: ${{ github.action_path }}
+      run: |
+        python3 -m kiko_profile.cli "${{ inputs.login }}" \
+          --output-dir "${{ inputs.output-dir }}" \
+          --stage "${{ inputs.stage }}" \
+          --background "${{ inputs.background }}" \
+          --width "${{ inputs.width }}" \
+          --height "${{ inputs.height }}"
